@@ -6,8 +6,8 @@ import datetime
 import logging
 import time
 
-from googleapiclient import discovery  # pylint: disable=import-error
-import oauth2client.file  # pylint: disable=import-error
+from googleapiclient import discovery
+import oauth2client.file
 
 from metabot.calendars import base
 from metabot.util import iso8601
@@ -36,7 +36,7 @@ class Calendar(base.Calendar):
         page_token = None
         while True:
             try:
-                results = self.service().events().list(
+                results = self.service().events().list(  # pylint: disable=no-member
                     calendarId=self.calpath,
                     singleEvents=True,
                     syncToken=self.sync_token,
@@ -107,11 +107,13 @@ class Calendar(base.Calendar):
         }
 
     def proto_add(self, proto):
+        # pylint: disable=no-member
         return self.service().events().insert(calendarId=self.calpath, body=proto).execute()
 
     def proto_remove(self, proto_id):
+        # pylint: disable=no-member
         self.service().events().delete(calendarId=self.calpath, eventId=proto_id).execute()
 
     def proto_update(self, proto_id, proto):
-        return self.service().events().patch(
+        return self.service().events().patch(  # pylint: disable=no-member
             calendarId=self.calpath, eventId=proto_id, body=proto).execute()
