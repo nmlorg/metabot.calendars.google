@@ -7,6 +7,13 @@ test_task:
       image: python:3.7
   pip_cache:
     folder: ~/.cache/pip
-    fingerprint_script: echo $PYTHON_VERSION && cat requirements-dev.txt
+    fingerprint_script:
+      - echo $PYTHON_VERSION
+      - cat requirements-dev.txt
+      - echo git+https://github.com/nmlorg/ntelebot
+      - echo git+https://github.com/nmlorg/metabot
     populate_script: pip install -r requirements-dev.txt git+https://github.com/nmlorg/ntelebot git+https://github.com/nmlorg/metabot -e .
-  test_script: pytest && pylint metabot
+  test_script:
+    - pip install -r requirements-dev.txt git+https://github.com/nmlorg/ntelebot git+https://github.com/nmlorg/metabot -e .
+    - pytest
+    - pylint metabot
