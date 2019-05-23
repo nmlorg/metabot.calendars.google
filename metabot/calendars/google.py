@@ -58,7 +58,9 @@ class Calendar(base.Calendar):
                         changes = True
             page_token = results.get('nextPageToken')
             if not page_token:
-                self.sync_token = results['nextSyncToken']
+                if self.sync_token != results['nextSyncToken']:
+                    self.sync_token = results['nextSyncToken']
+                    changes = True
                 break
             time.sleep(1)
         return changes

@@ -3,7 +3,7 @@ import setuptools
 
 setuptools.setup(
     name='metabot.calendars.google',
-    version='0.0.1',
+    version='0.0.2',
     author='Daniel Reed',
     author_email='nmlorg@gmail.com',
     description='Google Calendar loader for metabot.',
