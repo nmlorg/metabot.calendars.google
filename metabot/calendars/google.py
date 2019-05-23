@@ -27,8 +27,10 @@ class Calendar(base.Calendar):
 
         if cls._service is None:
             store = oauth2client.file.Storage('config/google_calendar_credentials.json')
-            cls._service = discovery.build(
-                'calendar', 'v3', credentials=store.get(), cache_discovery=False)
+            cls._service = discovery.build('calendar',
+                                           'v3',
+                                           credentials=store.get(),
+                                           cache_discovery=False)
         return cls._service
 
     def poll(self):
