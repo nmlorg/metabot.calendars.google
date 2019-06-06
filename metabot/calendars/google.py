@@ -1,7 +1,5 @@
 """Google Calendar (as in 'google:USERNAME@gmail.com') loader."""
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import datetime
 import logging
 import time
