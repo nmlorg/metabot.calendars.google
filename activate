@@ -18,4 +18,4 @@ fi
 if [ -d ../metabot ]; then
   pip install -U ../metabot
 fi
-pip install -U -e . -r requirements-dev.txt build twine
+pip install -U -e .[dev] build twine
