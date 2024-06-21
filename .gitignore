@@ -1,15 +1,12 @@
 /*.egg-info/
 /.pytest_cache/
 /.tox/
-/bin/
+/.venv/
 /build/
 /calendars/
 /config/
 /dist/
 /htmlcov/
-/include/
-/lib/
-/share/
 /.coverage
 *.pyc
 __pycache__/
