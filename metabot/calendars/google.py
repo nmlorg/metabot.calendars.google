@@ -31,7 +31,7 @@ class Calendar(base.Calendar):
                                            cache_discovery=False)
         return cls._service
 
-    def poll(self):
+    def poll(self):  # pylint: disable=arguments-differ
         changes = False
         page_token = None
         while True:
@@ -63,7 +63,7 @@ class Calendar(base.Calendar):
             time.sleep(1)
         return changes
 
-    def event_proto_to_local(self, proto):
+    def event_proto_to_local(self, proto):  # pylint: disable=arguments-differ
         return {
             'description': proto.get('description'),
             'end': self.datetime_proto_to_local(proto['end']),
@@ -74,7 +74,7 @@ class Calendar(base.Calendar):
             'updated': self.datetime_proto_to_local(proto['updated']),
         }
 
-    def event_local_to_proto(self, local):
+    def event_local_to_proto(self, local):  # pylint: disable=arguments-differ
         proto = {}
 
         for k in ('description', 'id', 'location', 'summary'):
@@ -108,14 +108,14 @@ class Calendar(base.Calendar):
             'timeZone': None,
         }
 
-    def proto_add(self, proto):
+    def proto_add(self, proto):  # pylint: disable=arguments-differ
         # pylint: disable=no-member
         return self.service().events().insert(calendarId=self.calpath, body=proto).execute()
 
-    def proto_remove(self, proto_id):
+    def proto_remove(self, proto_id):  # pylint: disable=arguments-differ
         # pylint: disable=no-member
         self.service().events().delete(calendarId=self.calpath, eventId=proto_id).execute()
 
-    def proto_update(self, proto_id, proto):
+    def proto_update(self, proto_id, proto):  # pylint: disable=arguments-differ
         return self.service().events().patch(  # pylint: disable=no-member
             calendarId=self.calpath, eventId=proto_id, body=proto).execute()
