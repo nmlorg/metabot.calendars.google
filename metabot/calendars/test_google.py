@@ -13,7 +13,7 @@ class _MockEventsList:  # pylint: disable=too-few-public-methods
         self.events = []
 
     def execute(self):  # pylint: disable=missing-function-docstring
-        ret = {'nextSyncToken': 'next sync token'}
+        ret = {'nextSyncToken': 'next sync token', 'timeZone': 'America/Los_Angeles'}
         if self.events:
             ret['nextPageToken'] = 'next page token'
             ret['items'] = [self.events.pop()]
@@ -97,18 +97,20 @@ def test_basic(cal):  # pylint: disable=redefined-outer-name
         },
         '8d983638:e64203a8': {
             'description': '',
-            'end': 1721520000.0,
+            'end': 1721545200.0,
             'id': 'alpha-id',
             'local_id': '8d983638:e64203a8',
             'location': '',
-            'start': 1721433600.0,
+            'start': 1721458800.0,
             'summary': '',
             'updated': 1721317496.837,
         },
     }
     alpha = cal.events['8d983638:e64203a8']
-    assert datetime.datetime.utcfromtimestamp(alpha['start']) == datetime.datetime(2024, 7, 20)
-    assert datetime.datetime.utcfromtimestamp(alpha['end']) == datetime.datetime(2024, 7, 21)
+    assert datetime.datetime.utcfromtimestamp(
+        alpha['start']) == datetime.datetime(2024, 7, 20) + datetime.timedelta(hours=7)
+    assert datetime.datetime.utcfromtimestamp(
+        alpha['end']) == datetime.datetime(2024, 7, 21) + datetime.timedelta(hours=7)
     assert datetime.datetime.utcfromtimestamp(alpha['updated']) == datetime.datetime(
         2024, 7, 18, 15, 44, 56, 837000)
     bravo = cal.events['8d983638:14deb9be']

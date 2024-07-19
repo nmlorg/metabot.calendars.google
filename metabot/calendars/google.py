@@ -16,6 +16,7 @@ class Calendar(base.Calendar):
 
     caltype = 'google'
     sync_token = None
+    default_timezone = None
 
     _service = None
 
@@ -47,6 +48,8 @@ class Calendar(base.Calendar):
                 self.events = {}
                 continue
 
+            if not self.default_timezone:
+                self.default_timezone = results.get('timeZone')
             for event in results.get('items', ()):
                 if event['status'] == 'cancelled':
                     if self._removed(event['id']):
@@ -87,8 +90,7 @@ class Calendar(base.Calendar):
 
         return proto
 
-    @staticmethod
-    def datetime_proto_to_local(proto):
+    def datetime_proto_to_local(self, proto):
         """Convert a time spec from Google Calendar API format to local format."""
 
         if isinstance(proto, dict):
@@ -96,7 +98,7 @@ class Calendar(base.Calendar):
                 proto = proto['dateTime']
             else:
                 proto = proto['date']
-        return iso8601.totimestamp(proto)
+        return iso8601.totimestamp(proto, self.default_timezone)
 
     @staticmethod
     def datetime_local_to_proto(local):
