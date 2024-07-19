@@ -70,8 +70,31 @@ def test_basic(cal):  # pylint: disable=redefined-outer-name
         'status': 'confirmed',
         'updated': '2024-07-18T15:44:56.837Z',
     })
+    cal.service().events().list().push({
+        'end': {
+            'dateTime': '2024-07-20T19:30:00-07:00',
+            'timeZone': 'America/Los_Angeles',
+        },
+        'id': 'bravo-id',
+        'start': {
+            'dateTime': '2024-07-20T14:30:00-07:00',
+            'timeZone': 'America/Los_Angeles',
+        },
+        'status': 'confirmed',
+        'updated': '2024-07-18T15:44:56.837Z',
+    })
     assert cal.poll() is True
     assert cal.events == {
+        '8d983638:14deb9be': {
+            'description': '',
+            'end': 1721529000.0,
+            'id': 'bravo-id',
+            'local_id': '8d983638:14deb9be',
+            'location': '',
+            'start': 1721511000.0,
+            'summary': '',
+            'updated': 1721317496.837,
+        },
         '8d983638:e64203a8': {
             'description': '',
             'end': 1721520000.0,
@@ -83,9 +106,16 @@ def test_basic(cal):  # pylint: disable=redefined-outer-name
             'updated': 1721317496.837,
         },
     }
-    ev = cal.events['8d983638:e64203a8']
-    assert datetime.datetime.utcfromtimestamp(ev['start']) == datetime.datetime(2024, 7, 20)
-    assert datetime.datetime.utcfromtimestamp(ev['end']) == datetime.datetime(2024, 7, 21)
-    assert datetime.datetime.utcfromtimestamp(ev['updated']) == datetime.datetime(
+    alpha = cal.events['8d983638:e64203a8']
+    assert datetime.datetime.utcfromtimestamp(alpha['start']) == datetime.datetime(2024, 7, 20)
+    assert datetime.datetime.utcfromtimestamp(alpha['end']) == datetime.datetime(2024, 7, 21)
+    assert datetime.datetime.utcfromtimestamp(alpha['updated']) == datetime.datetime(
+        2024, 7, 18, 15, 44, 56, 837000)
+    bravo = cal.events['8d983638:14deb9be']
+    assert datetime.datetime.utcfromtimestamp(
+        bravo['start']) == datetime.datetime(2024, 7, 20, 14, 30) + datetime.timedelta(hours=7)
+    assert datetime.datetime.utcfromtimestamp(
+        bravo['end']) == datetime.datetime(2024, 7, 20, 19, 30) + datetime.timedelta(hours=7)
+    assert datetime.datetime.utcfromtimestamp(bravo['updated']) == datetime.datetime(
         2024, 7, 18, 15, 44, 56, 837000)
     assert cal.poll() is False
