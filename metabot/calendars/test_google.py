@@ -1,9 +1,91 @@
 """Tests for metabot.calendars.google."""
 
+import datetime
+
+import pytest
+
 from metabot.calendars import google
 
 
-def test_import():
-    """Dummy test."""
+class _MockEventsList:  # pylint: disable=too-few-public-methods
 
-    assert google.Calendar
+    def __init__(self):
+        self.events = []
+
+    def execute(self):  # pylint: disable=missing-function-docstring
+        ret = {'nextSyncToken': 'next sync token'}
+        if self.events:
+            ret['nextPageToken'] = 'next page token'
+            ret['items'] = [self.events.pop()]
+
+        return ret
+
+    def push(self, event):
+        """Queue the given event for the next call to service().events().list(...)."""
+
+        self.events.append(event)
+
+
+class _MockEvents:  # pylint: disable=too-few-public-methods
+    _list = _MockEventsList()
+
+    @classmethod
+    def list(cls, **unused_kwargs):  # pylint: disable=missing-function-docstring
+        return cls._list
+
+
+class _MockService:  # pylint: disable=too-few-public-methods
+    _events = _MockEvents()
+
+    @classmethod
+    def events(cls):  # pylint: disable=missing-function-docstring
+        return cls._events
+
+
+class _MockCalendar(google.Calendar):
+    _service = _MockService()
+
+
+@pytest.fixture
+def cal():  # pylint: disable=missing-function-docstring
+    return _MockCalendar('google:metabot@example.com')
+
+
+def test_basic(cal):  # pylint: disable=redefined-outer-name
+    """Make sure the basic machinery is working."""
+
+    assert cal.sync_token is None
+    assert cal.poll() is True
+    assert cal.sync_token == 'next sync token'
+    assert cal.poll() is False
+    assert cal.events == {}
+    cal.service().events().list().push({
+        'end': {
+            'date': '2024-07-21',
+        },
+        'id': 'alpha-id',
+        'start': {
+            'date': '2024-07-20',
+        },
+        'status': 'confirmed',
+        'updated': '2024-07-18T15:44:56.837Z',
+    })
+    assert cal.poll() is True
+    assert cal.events == {
+        '8d983638:e64203a8': {
+            'description': '',
+            'end': 1721520000.0,
+            'id': 'alpha-id',
+            'local_id': '8d983638:e64203a8',
+            'location': '',
+            'start': 1721433600.0,
+            'summary': '',
+            'updated': 1721317496.837,
+        },
+    }
+    ev = cal.events['8d983638:e64203a8']
+    assert datetime.datetime.utcfromtimestamp(ev['start']) == datetime.datetime(2024, 7, 20)
+    assert datetime.datetime.utcfromtimestamp(ev['end']) == datetime.datetime(2024, 7, 21)
+    assert datetime.datetime.utcfromtimestamp(ev['updated']) == datetime.datetime(
+        2024, 7, 18, 15, 44, 56, 837000)
+    assert cal.poll() is False
